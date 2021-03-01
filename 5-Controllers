@@ -1,0 +1,64 @@
+kubectl run californiaapp \
+     --image=subaniprasad/californiaapp:1 \
+     -l=name=californiaapp \
+     --restart=Never \
+     --dry-run=client \
+     -o yaml > replicaset.yml
+     
+kubectl apply -f deployment.yml --record
+
+kubectl set image deployment/fleetman-application \
+        fleetman=richardchesterwood/k8s-fleetman-webapp-angular:release0-5 \
+        --record
+        
+kubectl rollout history deployment fleetman-application
+
+kubectl rollout history deployment fleetman-application --revision=1
+
+kubectl rollout history deployment fleetman-application --revision=2
+
+kubectl rollout undo deployment fleetman-application --to-revision=1
+
+###################################
+# Pause & Resume Deployment updates
+kubectl apply -f deployment.yaml
+
+# Pause Deployment rolling updates
+kubectl rollout pause deployment fleetman-application
+
+# Update the manifest and apply the changes and observe there will be no rolling feature
+# change replicas
+# change revisionHistoryLimit
+# change image
+kubectl apply -f deployment.yml
+
+# Edit the manifest and add below
+# resouces
+kubectl apply -f deployment.yml
+
+# Unpause the rollouts
+kubectl rollout resume deployment fleetman-application
+
+# Observe all the above changes will apply after resuming the rollouts
+###################################
+
+
+kubectl explain pod
+kubectl explain deployment
+
+
+######################################### Jobs
+# Explain the pod by default nature by creting the below pod.
+kubectl apply -f pod.yaml
+
+# To cleanup the completed pods created by Jobs we need to enable feature gates
+sudo su -
+cd /etc/kuberentes/manifests
+
+# open kube-apiserver.yaml
+# inside the command section, at the end add below line
+- --feature-gates=TTLAfterFinished=true
+
+# open kube-contoller-manager.yaml
+# inside the command section, at the end add below line
+- --feature-gates=TTLAfterFinished=true

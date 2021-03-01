@@ -1,0 +1,81 @@
+# To see the shedular inforatino on pod 
+kubectl describe pod <pod_name>
+
+######## Labels
+# Add Labels to the nodes.
+kubectl label node worker1.k8slocal.com color=blue
+kubectl label node worker2.k8slocal.com color=red
+
+kubectl get nodes -o wide --show-labels
+
+##########
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleetman-application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: fleetman
+        image: richardchesterwood/k8s-fleetman-webapp-angular:release0
+      nodeSelector:
+        color: <blue/red>
+###########
+
+# Remove labels from nodes.
+kubectl label node worker1.k8slocal.com color-
+kubectl label node worker2.k8slocal.com color-
+
+
+######## Taints & Tolerations
+
+kubectl label node worker1.k8slocal.com color=blue
+kubectl label node worker2.k8slocal.com color=red
+kubectl describe node worker2.k8slocal.com
+
+kubectl taint node worker2.k8slocal.com hardware=modern:NoSchedule
+
+#########
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleetman-application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: color
+                operator: In
+                values:
+                - red
+      containers:
+      - name: fleetman
+        image: richardchesterwood/k8s-fleetman-webapp-angular:release0
+      tolerations:
+      - key: "hardware"
+        operator: "Equal"
+        value: "modern"
+        effect: "NoSchedule"
+        
+#######
+      

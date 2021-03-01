@@ -1,0 +1,50 @@
+eksctl create cluster \
+       --name formac-cluster \
+       --version 1.15 \
+       --region ap-south-1 \
+       --nodegroup-name formac-linux-nodes-1-15 \
+       --nodes 3 \
+       --nodes-min 1 \
+       --nodes-max 4 \
+       --ssh-access \
+       --ssh-public-key PublicLaunchKey
+       
+eksctl upgrade cluster \
+       --name formac-cluster \
+       --region ap-south-1 \
+       --version=1.16 \
+       --approve
+       
+eksctl get nodegroups --cluster formac-cluster --region ap-south-1
+
+
+kubectl version --short
+eksctl get cluster --region ap-south-1
+
+eksctl upgrade nodegroup --cluster formac-cluster --name linux-nodes --kubernetes-version  1.16 --aprove
+
+eksctl create nodegroup \
+       --cluster=formac-cluster \
+       --kubernetes-version  1.16 \
+       --name formac-linux-nodes-1-16 \
+       --region ap-south-1 \
+       --nodes 3 \
+       --nodes-min 1 \
+       --nodes-max 4 \
+       --ssh-access \
+       --ssh-public-key PublicLaunchKey
+
+
+################
+
+
+
+############################
+# Create Cluster
+eksctl create cluster --name=formaceksdemo \
+                      --region=ap-south-1 \
+                      --zones=ap-south-1a,ap-south-1b \
+                      --without-nodegroup 
+                      
+# Get List of clusters
+eksctl get clusters
