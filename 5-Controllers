@@ -7,6 +7,10 @@ kubectl run californiaapp \
      
 kubectl apply -f deployment.yml --record
 
+kubectl rollout history deployment fleetman-application
+
+kubectl rollout history deployment fleetman-application --revision=1
+
 kubectl set image deployment/fleetman-application \
         fleetman=richardchesterwood/k8s-fleetman-webapp-angular:release0-5 \
         --record
